@@ -3,9 +3,9 @@ import time
 import logging
 import requests
 import json
-import mysql.connector
 import netCDF4
 import numpy as np
+import csv
 from datetime import datetime, timedelta
 
 # Configuration
@@ -15,28 +15,7 @@ DATASET_VERSION = "1.0"
 DOWNLOAD_DIRECTORY = "weather_data"
 BASE_URL = "https://api.dataplatform.knmi.nl/open-data/v1"
 
-# Database Configuration
-DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'admin',
-    'password': 'NS-server2026',
-    'database': 'NSdatabase'
-}
 
-# Potential Column Mappings (NetCDF Variable -> Possible Database Columns)
-# We prioritize exact matches, then fallbacks.
-VAR_MAPPING = {
-    'station': ['station', 'stn', 'station_id', 'station_code'],
-    'time': ['tijd', 'time', 'datum', 'date', 'datetime', 'timestamp'],
-    'ta': ['temperatuur', 'temp', 'ta', 'temperature', 'air_temperature'],
-    'rh': ['luchtvochtigheid', 'hum', 'rh', 'humidity', 'relative_humidity'],
-    'ff': ['wind_snelheid', 'wind_speed', 'ff', 'ws'],
-    'dd': ['wind_richting', 'wind_direction', 'dd', 'wd'],
-    'pp': ['luchtdruk', 'pressure', 'pp', 'air_pressure', 'pres'],
-    'D1H': ['neerslag_duur', 'rainfall_duration', 'd1h'],
-    'R1H': ['neerslag', 'rainfall', 'r1h', 'rain'],
-    'pg': ['neerslag_intensiteit', 'precip_intensity', 'pg']
-}
 
 # Setup logging
 logging.basicConfig(
@@ -83,196 +62,112 @@ def download_file(download_url, filepath):
         logger.error(f"Failed to download file: {e}")
         return False
 
-def get_db_connection():
-    try:
-        return mysql.connector.connect(**DB_CONFIG)
-    except mysql.connector.Error as err:
-        logger.error(f"Database connection failed: {err}")
-        return None
 
-def get_table_columns(cursor, table_name):
-    try:
-        cursor.execute(f"DESCRIBE {table_name}")
-        return [row[0] for row in cursor.fetchall()]
-    except mysql.connector.Error as err:
-        logger.error(f"Error describing table {table_name}: {err}")
-        return []
 
-def map_columns(db_columns):
-    final_map = {}
-    for nc_var, possible_names in VAR_MAPPING.items():
-        for name in possible_names:
-            if name in db_columns:
-                final_map[nc_var] = name
-                break
-    return final_map
+
 
 def process_nc_file(filepath):
-    logger.info(f"Processing {filepath} for database insertion...")
+    logger.info(f"Processing {filepath} for CSV conversion...")
+    csv_filepath = filepath + '.csv'
     
-    conn = get_db_connection()
-    if not conn:
-        logger.error("Skipping DB insertion due to connection handling.")
-        return
-
-    cursor = conn.cursor()
-    table_name = 'weer'
-    
-    # 1. Determine mapping
-    db_cols = get_table_columns(cursor, table_name)
-    if not db_cols:
-        logger.error(f"Could not retrieve columns for table '{table_name}'. Skipping.")
-        conn.close()
-        return
-        
-    logger.info(f"Found table '{table_name}' columns: {db_cols}")
-    
-    col_map = map_columns(db_cols)
-    if not col_map:
-        logger.warning("No valid columns mapped! Check table schema vs script mapping.")
-        conn.close()
-        return
-    
-    logger.info(f"Column mapping: {col_map}")
-
-    # 2. Open NetCDF
     try:
         ds = netCDF4.Dataset(filepath)
     except Exception as e:
         logger.error(f"Failed to open NetCDF file: {e}")
-        conn.close()
         return
 
     try:
-        # 3. Extract Data
-        # Ensure we have station and time
-        if 'station' not in ds.variables:
-            logger.error("NetCDF file missing 'station' variable.")
+        header = list(ds.variables.keys())
+        
+        # Get number of stations
+        num_stations = 0
+        if 'station' in ds.variables:
+            num_stations = len(ds.variables['station'])
+        else:
+            # Try to infer from a variable with a 'station' dimension
+            for var_name, var in ds.variables.items():
+                if 'station' in var.dimensions:
+                    num_stations = ds.dimensions['station'].size
+                    break
+        
+        if num_stations == 0:
+            logger.warning(f"Could not determine number of stations in {filepath}. Skipping.")
             ds.close()
-            conn.close()
             return
             
-        nc_stations = ds.variables['station'][:]
-        # Helper to decode bytes if necessary
-        stations = []
-        for s in nc_stations:
-            if isinstance(s, bytes):
-                stations.append(s.decode('utf-8').strip())
-            else:
-                stations.append(str(s))
-        
-        # Time handling
-        # Assuming typical KNMI structure: time dimension size 1, station dimension size N
-        # time variable usually has units "seconds since ..."
-        
-        nc_time_var = ds.variables.get('time')
-        if nc_time_var:
-            try:
-                # Get the single time value
-                time_val = nc_time_var[0] 
-                # Convert to Python datetime
-                # Handle cases where units might be missing or standard
-                if hasattr(nc_time_var, 'units'):
-                    date_obj = netCDF4.num2date(time_val, units=nc_time_var.units)
-                else:
-                    # Fallback default for KNMI logic if units missing (rare)
-                    # Often "seconds since 1950-01-01 00:00:00"
-                    date_obj = netCDF4.num2date(time_val, units="seconds since 1950-01-01 00:00:00")
-            except Exception as e:
-                logger.warning(f"Time conversion issue: {e}. Using current time.")
-                date_obj = datetime.now()
-        else:
-            date_obj = datetime.now()
-
-        # Build base Insert Query
-        # We insert one row per station
-        
-        # Prepare lists for batch insert
-        # We need to construct the SQL statement first
-        
-        # Columns to insert into
-        target_cols = list(col_map.values())
-        placeholders = ["%s"] * len(target_cols)
-        sql = f"INSERT INTO {table_name} ({', '.join(target_cols)}) VALUES ({', '.join(placeholders)})"
-        
-        # We need to handle duplicates? "ON DUPLICATE KEY UPDATE" or "IGNORE"? 
-        # User implies collecting history, so insert. Primary key usually prevents duplicates.
-        # Let's use INSERT IGNORE to be safe if PK exists.
-        sql = f"INSERT IGNORE INTO {table_name} ({', '.join(target_cols)}) VALUES ({', '.join(placeholders)})"
-
-        rows_to_insert = []
-        
-        # Iterate over stations (indices)
-        for i, station_code in enumerate(stations):
-            row_data = []
-            valid_row = True
+        with open(csv_filepath, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=header)
+            writer.writeheader()
             
-            for nc_var, db_col in col_map.items():
-                val = None
-                
-                if nc_var == 'station':
-                    val = station_code
-                elif nc_var == 'time':
-                    val = date_obj
-                else:
-                    # Variable from NetCDF
-                    if nc_var in ds.variables:
-                        # shape is usually (time, station) or just (station)
-                        var_data = ds.variables[nc_var]
-                        # Check dimensions
-                        if 'station' in var_data.dimensions:
-                            # Assuming logical layout (time, station) or (station)
-                            # inspect_nc showed time:1, station:52.
-                            # So variables probably (time, station) -> [0, i]
-                            # OR (station) -> [i]
+            rows_to_insert = []
+            
+            for i in range(num_stations):
+                row_data = {}
+                for var_name in header:
+                    var = ds.variables[var_name]
+                    val = None
+                    
+                    try:
+                        # A variable can be scalar, 1D, 2D, etc.
+                        # We try to extract the value that corresponds to the i-th station
+                        if 'station' in var.dimensions:
+                            # The variable is indexed by station
+                            s_index = var.dimensions.index('station')
                             
-                            dims = var_data.dimensions
-                            try:
-                                if dims == ('time', 'station'):
-                                    val = var_data[0, i]
-                                elif dims == ('station',):
-                                    val = var_data[i]
-                                elif dims == ('station', 'time'): # unlikely
-                                    val = var_data[i, 0]
-                                else:
-                                    # Fallback: flatten and take i if size matches?
-                                    if var_data.size == len(stations):
-                                        val = var_data.flatten()[i]
-                            except Exception:
-                                val = None
-                        
-                        # Handle MaskedConstant (missing data)
-                        if val is not None and np.ma.is_masked(val):
-                            val = None
-                        
-                        # Convert numpy types to python native
-                        if isinstance(val, (np.floating, float)):
-                            val = float(val)
-                        elif isinstance(val, (np.integer, int)):
-                            val = int(val)
+                            # Create a slicer tuple
+                            slicer = [slice(None)] * len(var.dimensions)
+                            slicer[s_index] = i
                             
-                    else:
+                            # For other dimensions, take the first element (e.g., time)
+                            for d_idx, dim_name in enumerate(var.dimensions):
+                                if dim_name != 'station':
+                                    slicer[d_idx] = 0 # Take first element for other dimensions
+                            
+                            val = var[tuple(slicer)]
+
+                        elif len(var.shape) > 0 and var.shape[0] == num_stations:
+                             # Guessing that this variable is also indexed by station
+                             val = var[i]
+                        else:
+                            # Not indexed by station, so repeat the value for each station
+                            # Take the first element if it's an array
+                            if hasattr(var, 'flatten'):
+                                flat_var = var[:].flatten()
+                                if flat_var.size > 0:
+                                    val = flat_var[0]
+                            else:
+                                val = var[()]
+
+
+                    except Exception:
                         val = None
-                
-                row_data.append(val)
-            
-            rows_to_insert.append(tuple(row_data))
-        
-        # Execute Batch Insert
-        if rows_to_insert:
-            logger.info(f"Inserting {len(rows_to_insert)} rows into {table_name}...")
-            cursor.executemany(sql, rows_to_insert)
-            conn.commit()
-            logger.info("Insertion complete.")
-        else:
-            logger.warning("No rows prepared for insertion.")
+
+                    # convert to python native types
+                    if val is not None and np.ma.is_masked(val):
+                        val = None
+                    
+                    if isinstance(val, (np.floating, float)):
+                        val = float(val)
+                    elif isinstance(val, (np.integer, int)):
+                        val = int(val)
+                    elif isinstance(val, bytes):
+                        val = val.decode('utf-8').strip()
+
+                    row_data[var_name] = val
+                    
+                rows_to_insert.append(row_data)
+
+            if rows_to_insert:
+                logger.info(f"Writing {len(rows_to_insert)} rows to {csv_filepath}...")
+                writer.writerows(rows_to_insert)
+                logger.info("CSV writing complete.")
+            else:
+                logger.warning("No rows prepared for writing.")
             
     except Exception as e:
-        logger.error(f"Error during processing/insertion: {e}")
+        logger.error(f"Error during processing/writing: {e}")
     finally:
         ds.close()
-        cursor.close()
-        conn.close()
 
 def main():
     # Ensure download directory exists
