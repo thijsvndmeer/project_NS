@@ -36,7 +36,7 @@ while n < collection_time:
     time = datetime.now().replace(second=0, microsecond=0)
     t = True
     while t:
-        if (datetime.now().replace(second=0, microsecond=0) - time).total_seconds() < 240:
+        if (datetime.now().replace(second=0, microsecond=0) - time).total_seconds() > 240:
             t = False
     print(datetime.now().replace(second=0, microsecond=0))
 
