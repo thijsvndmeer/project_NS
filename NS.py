@@ -54,7 +54,7 @@ def get_departures(station, time, iucCode):
 
 
         dif = dep_time - time
-        if dif.total_seconds() <= 60:
+        if dif.total_seconds() <= 300:
             name = f'{dep['product']['shortCategoryName']} naar {dep['direction']} van {dep_time}'
             print(f'The {name} is withing the window')
             dep['name'] = name

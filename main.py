@@ -4,7 +4,13 @@ from datetime import datetime
 
 db = ns.openconnection()
 
-stations = ns.get_stations(db, ['Leiden Centraal', 'Amsterdam Centraal', 'Beverwijk', 'Zoetermeer', 'Hoorn'])
+stations = []
+cursor = db.cursor()
+cursor.execute('SELECT naam FROM station')
+for row in cursor:
+    stations.append(row[0])
+
+stations = ns.get_stations(db, stations)
 
 collection_time = int(input('How long do you wish to collect? (in minutes)'))
 
@@ -16,7 +22,7 @@ def main_loop(stations, db):
         print(f'searching for departures from {station}')
         departures = ns.get_departures(station, now, stations[station]['iucCode'])
 
-        if len(departures) > 0:
+        if departures != None:
             ns.insert_stops(departures, db, stations[station]['id'])
         else: print(f'no departures for {station}')
 
@@ -30,7 +36,7 @@ while n < collection_time:
     time = datetime.now().replace(second=0, microsecond=0)
     t = True
     while t:
-        if (datetime.now().replace(second=0, microsecond=0) - time).total_seconds() > 0:
+        if (datetime.now().replace(second=0, microsecond=0) - time).total_seconds() < 240:
             t = False
     print(datetime.now().replace(second=0, microsecond=0))
 
