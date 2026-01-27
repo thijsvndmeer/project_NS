@@ -1,0 +1,376 @@
+/* RESET */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --ns-blue: #003082;
+    --ns-yellow: #FFC917;
+    --cream: #FFF9E6;
+    --white: #FFFFFF;
+    --text: #111111;
+    --grey-light: #F4F4F4;
+}
+
+body {
+    background: #333;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* A0 CONTAINER (Fixed Pixel Equivalent) */
+.poster-container {
+    width: 1920px;
+    height: 1358px;
+    /* A0 Aspect Ratio */
+    background: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Strict containment */
+}
+
+/* COMPACT HEADER (140px) */
+.poster-header {
+    height: 140px;
+    background: var(--ns-blue);
+    color: white;
+    border-bottom: 10px solid var(--ns-yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-inner {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.ns-logo {
+    width: 80px;
+    height: 80px;
+}
+
+.title-area h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 5px;
+}
+
+.authors {
+    font-size: 1.1rem;
+    color: #DDD;
+}
+
+.divider {
+    color: var(--ns-yellow);
+    margin: 0 10px;
+}
+
+/* MAIN GRID (3 Columns) */
+.content-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    /* Use fr to handle gap subtraction automatically */
+    gap: 30px;
+    padding: 30px;
+    background: var(--grey-light);
+}
+
+/* COLUMNS */
+.col-left,
+.col-center,
+.col-right {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.col-left {
+    background: var(--cream);
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #EEDDCC;
+}
+
+.col-center {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #DDD;
+}
+
+.col-right {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    border: 1px solid #DDD;
+}
+
+/* TYPOGRAPHY COMPACT */
+h2 {
+    color: var(--ns-blue);
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 15px;
+    border-bottom: 3px solid var(--ns-yellow);
+    display: inline-block;
+}
+
+p,
+li {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333;
+    margin-bottom: 12px;
+}
+
+/* QUESTION LIST */
+.q-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: center;
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.q-badge {
+    background: var(--ns-blue);
+    color: white;
+    font-weight: bold;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.q-item p {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* NATIVE ERD (V5 Topology) */
+.erd-wrapper {
+    /* Removed flex: 1 to prevent excessive height */
+    display: flex;
+    flex-direction: column;
+}
+
+.erd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.badge {
+    background: #E0E0E0;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.erd-canvas {
+    position: relative;
+    border: 1px solid #EEE;
+    border-radius: 8px;
+    background-image: radial-gradient(#E0E0E0 1px, transparent 1px);
+    background-size: 20px 20px;
+    height: 550px;
+    /* Adjusted to fit content (~460px) + padding */
+}
+
+/* DB TABLES (Compact) */
+.db-table {
+    position: absolute;
+    background: white;
+    border: 1px solid #888;
+    border-radius: 4px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    width: 160px;
+    /* Narrower */
+    font-size: 0.8rem;
+    z-index: 2;
+}
+
+.chart-simple {
+    height: 150px;
+    background: #F4F4F4;
+    border-radius: 6px;
+    border: 1px dashed #CCC;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.chart-simple::after {
+    content: "Visualisatie hier";
+}
+
+.db-head {
+    background: var(--ns-blue);
+    color: white;
+    padding: 6px;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 2px solid var(--ns-yellow);
+}
+
+.db-row {
+    padding: 4px 8px;
+    border-bottom: 1px solid #F0F0F0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.pk {
+    color: #D00;
+    font-weight: 800;
+    font-size: 0.7rem;
+}
+
+.fk {
+    color: #888;
+    font-style: italic;
+    font-size: 0.7rem;
+}
+
+/* ERD COORDINATES (Optimized) */
+/* Col 1 */
+.pos-location {
+    top: 100px;
+    left: 50px;
+}
+
+.pos-weer {
+    top: 300px;
+    left: 50px;
+}
+
+/* Col 2 */
+.pos-station {
+    top: 100px;
+    left: 300px;
+}
+
+.pos-realstop {
+    top: 300px;
+    left: 300px;
+    width: 220px;
+    border: 2px solid var(--ns-yellow);
+}
+
+/* Col 3 */
+.pos-traject {
+    top: 100px;
+    left: 550px;
+}
+
+.pos-trein {
+    top: 300px;
+    left: 550px;
+}
+
+/* SVG */
+.erd-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.sql-box {
+    margin-top: 15px;
+    background: #00225E;
+    color: #FFF;
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    /* Increased from 0.8rem */
+    font-family: monospace;
+    line-height: 1.4;
+}
+
+/* STATS */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.stat-item {
+    background: #F8F8F8;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 5px solid #CCC;
+}
+
+.stat-val {
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.stat-val.blue {
+    color: var(--ns-blue);
+    border-color: var(--ns-blue);
+}
+
+.stat-val.yellow {
+    color: #D4A000;
+}
+
+.stat-item:nth-child(1) {
+    border-color: var(--ns-blue);
+}
+
+.stat-item:nth-child(2) {
+    border-color: var(--ns-blue);
+}
+
+.stat-item:nth-child(3) {
+    border-color: var(--ns-yellow);
+}
+
+.bar-group {
+    margin-top: 20px;
+}
+
+.bar {
+    height: 10px;
+    background: #CCC;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+.bar.alert {
+    background: #D00;
+}
+
+.footer-mini {
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: #AAA;
+    text-transform: uppercase;
+    text-align: right;
+}@media print { @page { size: 1920px 1358px; margin: 0; } body { margin: 0; padding: 0; background: white; width: 1920px; height: 1358px; overflow: hidden; -webkit-print-color-adjust: exact; print-color-adjust: exact; } .poster-container { margin: 0; border: none; width: 100%; height: 100%; box-shadow: none; page-break-inside: avoid; } }

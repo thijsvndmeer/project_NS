@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <title>NS Punctualiteit Poster V5 (Perfect)</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index,follow">
+    <meta name="generator" content="GrapesJS Studio">
+    <link rel="stylesheet" href="style_v5.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
+        rel="stylesheet" />
+</head>
+
+<body id="ibody" class="gjs-t-body">
+    <div class="poster-container" id="iebozi"><!-- HEADER (Compact 140px) -->
+        <header class="poster-header" id="i165oh">
+            <div class="header-inner" id="i4co4j">
+                <div class="logo-area" id="ix5xnq">
+                    <img src="ns logo wit.png" alt="NS Logo" style="height: 60px; width: auto;">
+                </div>
+                <div class="title-area" id="ijaf6h" style="flex: 1; text-align: center;">
+                    <h1 id="i59tjm">Hoe hangen weersomstandigheden samen met de punctualiteit van NS-treinen?</h1>
+                    <div class="authors" id="iinj3v">
+                        <strong id="idc544">Wesley van den Engh, Jens Groen, Thijs van der Meer, Tijs
+                            Voorsteegh</strong>
+                        <span class="divider" id="it8x1i">|</span>
+                        UvA Data Management &amp; Engineering
+                    </div>
+                </div>
+                <div class="logo-area-right">
+                    <img src="uva logo wit.png" alt="UvA Logo" style="height: 95px; width: auto;">
+                </div>
+            </div>
+        </header><!-- MAIN GRID (12 Columns) -->
+        <main class="content-grid" id="i6zrpr"><!-- LEFT COLUMN (Intro & Qs) -->
+            <div class="col-left theme-cream" id="i4kztu">
+                <section class="section-intro" id="i0kz2r">
+                    <h2 id="iphhjd">Introductie</h2>
+                    <img src="header_viz.png" alt="NS Train in Storm"
+                        style="width: 120%; margin: -30px 0 -60px -10%; border-radius: 6px; mix-blend-mode: multiply; display: block;">
+                    <p id="ibplkp">
+                        Extreme weersomstandigheden zoals sneeuw en storm hebben een disproportionele impact op de
+                        dienstregeling.
+                        Dit project kwantificeert deze relatie door historische <strong id="ik41ry">NS-ritdata</strong>
+                        te koppelen
+                        aan <strong id="iflnis">KNMI-weergegevens</strong>.
+                    </p>
+                </section>
+                <section class="section-questions" id="ifqhbr">
+                    <h2 id="iquelm">Vraagstelling</h2>
+                    <div class="q-list" id="iv0a2s">
+                        <div class="q-item" id="idq02r">
+                            <span class="q-badge" id="i4v9b4">1</span>
+                            <p id="i2laio">Wat is de correlatie tussen <strong id="indpdh">neerslag</strong> en
+                                vertraging?</p>
+                        </div>
+                        <div class="q-item" id="i0a3zn">
+                            <span class="q-badge" id="i7q2hf">2</span>
+                            <p id="ip3gyn">Welke <strong id="ivfgai">trajecten</strong> zijn het meest gevoelig voor
+                                wind?</p>
+                        </div>
+                        <div class="q-item" id="ikbr3p">
+                            <span class="q-badge" id="ihit8l">3</span>
+                            <p id="ih9c2a">Hoe beïnvloedt <strong id="itdqfd">sneeuw</strong> de totale uitval?</p>
+                        </div>
+                    </div>
+                </section>
+                <section class="section-methods" id="iiashw">
+                    <h2 id="icwb0k">Methodologie</h2>
+                    <ul class="method-steps" id="iol0ii">
+                        <li id="it79hl">
+                            <strong id="in3hyl">Data</strong>: NS API (ritten) + KNMI (weer).
+                        </li>
+                        <li id="i25z2m">
+                            <strong id="ib4r9h">Clean</strong>: GPS-mapping stops naar weerstations.
+                        </li>
+                        <li id="i9gk7u">
+                            <strong id="ivbn16">Model</strong>: 3NF Relational Schema (zie rechts).
+                        </li>
+                        <li id="ij147t">
+                            <strong id="iy8ryc">SQL</strong>: Aggregatie op `type` en `traject`.
+                        </li>
+                    </ul>
+                </section>
+            </div><!-- CENTER COLUMN (Native ERD - Reorganized) -->
+            <div class="col-center theme-white erd-wrapper" id="i9kh28">
+                <div class="erd-header" id="ib1dej">
+                    <h2 id="i619ug">Data Model (ERD)</h2>
+                    <span class="badge" id="iylq1h">Genormaliseerd (3NF)</span>
+                </div>
+                <div class="erd-canvas" id="i6p9lw">
+                    <!-- TABLES (Topologically Sorted for V5) --><!-- COLUMN 1: Environment -->
+                    <div class="db-table pos-location" id="imzcxq">
+                        <div class="db-head" id="ijz1ko">Location</div>
+                        <div class="db-row" id="ieo3nr">
+                            <span class="pk" id="i2s9yg">PK</span> id
+                        </div>
+                        <div class="db-row" id="i0p5ex">naam, x, y</div>
+                    </div>
+                    <div class="db-table pos-weer" id="irf6g9">
+                        <div class="db-head" id="iat4nl">Weer</div>
+                        <div class="db-row" id="ia05j9">
+                            <span class="pk" id="i6vl9x">PK</span> id
+                        </div>
+                        <div class="db-row" id="ifjst7">
+                            <span class="fk" id="i3yp2u">FK</span> locatie
+                        </div>
+                        <div class="db-row" id="ivfs3w">type, time</div>
+                    </div><!-- COLUMN 2: Infrastructure -->
+                    <div class="db-table pos-station" id="i8b4rq">
+                        <div class="db-head" id="ir6gvj">Station</div>
+                        <div class="db-row" id="i0k1vk">
+                            <span class="pk" id="iwtcem">PK</span> id
+                        </div>
+                        <div class="db-row" id="iqco2y">naam</div>
+                        <div class="db-row" id="i7sp4z">
+                            <span class="fk" id="itj8dd">FK</span> location
+                        </div>
+                    </div>
+                    <div class="db-table pos-realstop" id="ikid7p">
+                        <div class="db-head" id="i68mpi">Real_stop</div>
+                        <div class="db-row" id="i4q5zf">
+                            <span class="pk" id="ih8ojl">PK</span> id
+                        </div>
+                        <div class="db-row" id="i6gggn">
+                            <span class="fk" id="i7lcjk">FK</span> station
+                        </div>
+                        <div class="db-row" id="i8pi9i">
+                            <span class="fk" id="ixc5f7">FK</span> trein
+                        </div>
+                        <div class="db-row" id="itov5g">aankomst, vertrek</div>
+                        <div class="db-row" id="ixu6en">vertraging</div>
+                    </div><!-- COLUMN 3: Logistics -->
+                    <div class="db-table pos-traject" id="ivg789">
+                        <div class="db-head" id="iktiwj">Traject</div>
+                        <div class="db-row" id="ikq9dg">
+                            <span class="pk" id="iig0rs">PK</span> id
+                        </div>
+                        <div class="db-row" id="i84c63">
+                            <span class="fk" id="i6bex4">FK</span> start, einde
+                        </div>
+                    </div>
+                    <div class="db-table pos-trein" id="i0lf6h">
+                        <div class="db-head" id="i6cwhg">Trein</div>
+                        <div class="db-row" id="if8k9a">
+                            <span class="pk" id="ihrvbf">PK</span> id
+                        </div>
+                        <div class="db-row" id="itwn0r">
+                            <span class="fk" id="isml3n">FK</span> traject
+                        </div>
+                        <div class="db-row" id="iih4x7">type</div>
+                    </div><!-- ORTHOGONAL CONNECTORS (V5) --><!-- 1:1 Pixel Mapping with CSS positions -->
+                    <svg width="100%" height="100%" class="erd-svg" id="iydcxv">
+                        <defs id="iplhz4">
+                            <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                                <path d="M0,0 L0,8 L8,4 z" fill="#003082" id="icg04m"></path>
+                            </marker>
+                        </defs>
+                        <path d="M 120 300 L 120 250 L 120 180" stroke="#003082" stroke-width="2" fill="none"
+                            marker-end="url(#arrow)" id="iug8hu"></path>
+                        <path d="M 300 120 L 255 120 L 210 120" stroke="#003082" stroke-width="2" fill="none"
+                            marker-end="url(#arrow)" id="idstsp"></path>
+                        <path d="M 390 300 L 390 240 L 390 180" stroke="#003082" stroke-width="2" fill="none"
+                            marker-end="url(#arrow)" id="iujpsm"></path>
+                        <path d="M 520 350 L 535 350 L 535 350 L 550 350" stroke="#003082" stroke-width="2" fill="none"
+                            marker-end="url(#arrow)" id="i7xxfa"></path>
+                        <path d="M 640 300 L 640 240 L 640 180" stroke="#003082" stroke-width="2" fill="none"
+                            marker-end="url(#arrow)" id="i73jt7"></path>
+                        <path d="M 550 120 L 515 120 L 480 120" stroke="#003082" stroke-width="2" stroke-dasharray="4,4"
+                            fill="none" marker-end="url(#arrow)" id="ii979p"></path>
+                    </svg>
+                </div> <!-- End ERD Canvas -->
+                <div class="sql-box" id="ijz3jg">
+                    <strong id="i7axw1">SQL Analyses:</strong>
+                    <code id="iwkacv">SELECT type, AVG(vertraging) FROM real_stop JOIN weer ... GROUP BY type;</code>
+                </div>
+            </div><!-- RIGHT COLUMN (Results) -->
+            <div id="isrvw1" role="complementary" aria-label="Rechter kolom: resultaten en conclusie"
+                class="col-right theme-white">
+                <section id="idop7s" role="region" aria-labelledby="itply2" class="section-results">
+                    <h2 id="itply2">Resultaten</h2>
+                    <div id="ipv1dk" class="stats-grid">
+                        <div id="imlw4k" class="stat-item">
+                            <div id="ih6k0o" class="stat-val blue">4.2<small id="ib9kp3">min</small>
+                            </div>
+                            <div id="i5z89w" class="stat-label">Regen</div>
+                        </div>
+                        <div id="iml3uy" class="stat-item">
+                            <div id="i5lj05" class="stat-val blue">6.5<small id="iws4cp">min</small>
+                            </div>
+                            <div id="iyhyic" class="stat-label">Storm</div>
+                        </div>
+                        <div id="ifjmhs" class="stat-item">
+                            <div id="ivin1o" class="stat-val yellow">9.4<small id="i7fjoj">min</small>
+                            </div>
+                            <div id="ib4ffh" class="stat-label">Sneeuw</div>
+                        </div>
+                    </div>
+                    <img src="footer_viz.png" alt="NS Train in Snow"
+                        style="width: 100%; border-radius: 6px; margin-bottom: -105px; margin-left: -28.5px; margin-top: -50px; mix-blend-mode: multiply; mask-image: radial-gradient(ellipse at center, black 70%, transparent 100%); -webkit-mask-image: radial-gradient(ellipse at center, black 70%, transparent 100%);">
+                </section>
+                <hr aria-hidden="true" class="section-sep" id="ik705g" />
+                <section id="i0u1h9" role="region" aria-labelledby="ifzh3f" class="section-conclusion">
+                    <h2 id="ifzh3f">Conclusie</h2>
+                    <img src="snow_icon.png" alt="Snow Disruption"
+                        style="width: 60px; float: right; margin-left: 10px; margin-bottom: 5px;">
+                    <p id="i8s6fl">
+                        <strong id="iincqs">Sneeuw is de "Killer".</strong> Terwijl regen lineaire vertragingen geeft,
+                        zorgt sneeuw
+                        voor exponentiële uitval door wisselstoringen.
+                    </p>
+                    <p id="izcbnh">
+                        <strong id="ieqrkg">Advies:</strong> Preventief uitdunnen is de enige effectieve strategie bij
+                        Code Rood.
+                    </p>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
