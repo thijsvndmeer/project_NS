@@ -107,3 +107,10 @@ def insert_stops(dep, db, id):
         cursor.execute(sql, values)
 
     cursor.close()
+
+
+
+
+def compute_avg_delay(day, *args, **kwargs):
+    print(f'computing average delay for trains on {day}')
+    day = datetime.strptime(day, '%Y')
