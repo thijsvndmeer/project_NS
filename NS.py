@@ -106,7 +106,7 @@ def insert_stops(dep, db, id):
 
         db.commit()
 
-        print('stop succesfully added to the database')
+        print('stop successfully added to the database')
 
     cursor.close()
 

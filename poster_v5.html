@@ -165,7 +165,7 @@
                 </div> <!-- End ERD Canvas -->
                 <div class="sql-box" id="ijz3jg">
                     <strong id="i7axw1">SQL Analyse:</strong>
-                    <code id="iwkacv">SELECT w.type, AVG(s.vertraging_vertrek) FROM stop s JOIN station st ON s.station = st.id JOIN location l ON st.locatie = l.id JOIN weer w ON w.locatie = l.id AND DATE(s.vertrek) = DATE(w.tijd) GROUP BY w.type;</code>
+                    <code id="iwkacv">SELECT w.type, AVG(s.vertraging_vertrek)<br>FROM stop s<br>JOIN station st ON s.station = st.id<br>JOIN location l ON st.locatie = l.id<br>JOIN weer w ON w.locatie = l.id<br>&nbsp;&nbsp;AND DATE(s.vertrek) = DATE(w.tijd)<br>GROUP BY w.type;</code>
                 </div>
             </div><!-- RIGHT COLUMN (Results) -->
             <div id="isrvw1" role="complementary" aria-label="Rechter kolom: resultaten en conclusie"
