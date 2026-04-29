@@ -1,3 +1,4 @@
+import os
 import requests as req
 import json
 import mysql.connector as SQLconnect
@@ -9,10 +10,10 @@ from datetime import datetime
 def openconnection():
     print('Opening connection to database...')
     db = SQLconnect.connect(
-    host='localhost',
-    user='admin',
-    password='NS-server2026',
-    database='NSdatabase')
+        host=os.environ.get('DB_HOST', 'localhost'),
+        user=os.environ.get('DB_USER', 'admin'),
+        password=os.environ.get('DB_PASSWORD', ''),
+        database=os.environ.get('DB_NAME', 'NSdatabase'))
     print('Connection established!')
     return db
 
@@ -44,22 +45,23 @@ def get_stations(db, stations):
 
 def get_departures(station, time, iucCode):
     final = []
-    sub_key = '76c74d43ff344b63b889a3ad12126b2a'
-    result = req.get(f'https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/departures?uicCode={iucCode}&maxJourneys=10]', headers={'Ocp-Apim-Subscription-Key': sub_key})
+    sub_key = os.environ.get('NS_API_KEY', '')
+    result = req.get(f'https://gateway.apiportal.ns.nl/reisinformatie-api/api/v2/departures?uicCode={iucCode}&maxJourneys=10', headers={'Ocp-Apim-Subscription-Key': sub_key})
     result = result.json()['payload']['departures']
 
     for dep in result:
-        name=f'{dep['product']['shortCategoryName']} naar {dep['direction']} van {dep['actualDateTime']}'
-        dep_time = datetime.strptime(dep['actualDateTime'].split('+')[0], '%Y-%m-%dT%H:%M:%S').replace(second=0)
-
+        dep_time = datetime.strptime(dep['actualDateTime'].split('+')[0], '%Y-%m-%dT%H:%M:%S').replace(second=0, microsecond=0)
 
         dif = dep_time - time
         if dif.total_seconds() <= 300:
-            name = f'{dep['product']['shortCategoryName']} naar {dep['direction']} van {dep_time}'
-            print(f'The {name} is withing the window')
+            name = f"{dep['product']['shortCategoryName']} naar {dep['direction']} van {dep_time}"
+            print(f'The {name} is within the window')
             dep['name'] = name
             final.append(dep)
-        else: return(final)
+        else:
+            return final
+
+    return final
 
 
 
@@ -84,12 +86,12 @@ def insert_stops(dep, db, id):
         result = cursor.fetchone()
 
         if result == None:
-            print(f'inserting {stop['name']} has failed, skipping' )
+            print(f"inserting {stop['name']} has failed, skipping")
             continue
 
         values.append(result[0])
 
-        print(f'adding the {stop['name']} to the database)')
+        print(f"adding the {stop['name']} to the database")
 
         sql = 'SELECT * FROM stop WHERE station = %s AND vertrek = %s AND vertraging_vertrek = %s AND richting = %s'
         cursor.execute(sql, values)
@@ -100,11 +102,11 @@ def insert_stops(dep, db, id):
 
         sql = 'INSERT INTO stop (station, vertrek, vertraging_vertrek, richting) VALUES (%s, %s, %s, %s)'
 
+        cursor.execute(sql, values)
+
         db.commit()
 
         print('stop succesfully added to the database')
-
-        cursor.execute(sql, values)
 
     cursor.close()
 
@@ -113,4 +115,4 @@ def insert_stops(dep, db, id):
 
 def compute_avg_delay(day, *args, **kwargs):
     print(f'computing average delay for trains on {day}')
-    day = datetime.strptime(day, '%Y')
+    day = datetime.strptime(day, '%Y-%m-%d')

@@ -2,7 +2,7 @@
 <html lang="nl">
 
 <head>
-    <title>NS Punctualiteit Poster V5 (Perfect)</title>
+    <title>NS Punctualiteit Poster</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="index,follow">
@@ -92,13 +92,14 @@
                     <span class="badge" id="iylq1h">Genormaliseerd (3NF)</span>
                 </div>
                 <div class="erd-canvas" id="i6p9lw">
-                    <!-- TABLES (Topologically Sorted for V5) --><!-- COLUMN 1: Environment -->
+                    <!-- TABLES (Actual DB schema: location, station, stop, weer, weertype) -->
+                    <!-- COLUMN 1: Environment -->
                     <div class="db-table pos-location" id="imzcxq">
                         <div class="db-head" id="ijz1ko">Location</div>
                         <div class="db-row" id="ieo3nr">
                             <span class="pk" id="i2s9yg">PK</span> id
                         </div>
-                        <div class="db-row" id="i0p5ex">naam, x, y</div>
+                        <div class="db-row" id="i0p5ex">naam, lat, lon</div>
                     </div>
                     <div class="db-table pos-weer" id="irf6g9">
                         <div class="db-head" id="iat4nl">Weer</div>
@@ -108,74 +109,63 @@
                         <div class="db-row" id="ifjst7">
                             <span class="fk" id="i3yp2u">FK</span> locatie
                         </div>
-                        <div class="db-row" id="ivfs3w">type, time</div>
+                        <div class="db-row" id="ivfs3w">
+                            <span class="fk" id="i3yp2v">FK</span> type
+                        </div>
+                        <div class="db-row">tijd</div>
                     </div><!-- COLUMN 2: Infrastructure -->
                     <div class="db-table pos-station" id="i8b4rq">
                         <div class="db-head" id="ir6gvj">Station</div>
                         <div class="db-row" id="i0k1vk">
                             <span class="pk" id="iwtcem">PK</span> id
                         </div>
-                        <div class="db-row" id="iqco2y">naam</div>
+                        <div class="db-row" id="iqco2y">naam, uic</div>
                         <div class="db-row" id="i7sp4z">
-                            <span class="fk" id="itj8dd">FK</span> location
+                            <span class="fk" id="itj8dd">FK</span> locatie
                         </div>
                     </div>
                     <div class="db-table pos-realstop" id="ikid7p">
-                        <div class="db-head" id="i68mpi">Real_stop</div>
+                        <div class="db-head" id="i68mpi">Stop</div>
                         <div class="db-row" id="i4q5zf">
                             <span class="pk" id="ih8ojl">PK</span> id
                         </div>
                         <div class="db-row" id="i6gggn">
                             <span class="fk" id="i7lcjk">FK</span> station
                         </div>
-                        <div class="db-row" id="i8pi9i">
-                            <span class="fk" id="ixc5f7">FK</span> trein
-                        </div>
-                        <div class="db-row" id="itov5g">aankomst, vertrek</div>
-                        <div class="db-row" id="ixu6en">vertraging</div>
-                    </div><!-- COLUMN 3: Logistics -->
-                    <div class="db-table pos-traject" id="ivg789">
-                        <div class="db-head" id="iktiwj">Traject</div>
-                        <div class="db-row" id="ikq9dg">
-                            <span class="pk" id="iig0rs">PK</span> id
-                        </div>
-                        <div class="db-row" id="i84c63">
-                            <span class="fk" id="i6bex4">FK</span> start, einde
-                        </div>
-                    </div>
+                        <div class="db-row" id="itov5g">vertrek, richting</div>
+                        <div class="db-row" id="ixu6en">vertraging_vertrek</div>
+                    </div><!-- COLUMN 3: Classification -->
                     <div class="db-table pos-trein" id="i0lf6h">
-                        <div class="db-head" id="i6cwhg">Trein</div>
+                        <div class="db-head" id="i6cwhg">Weertype</div>
                         <div class="db-row" id="if8k9a">
-                            <span class="pk" id="ihrvbf">PK</span> id
+                            <span class="pk" id="ihrvbf">PK</span> naam
                         </div>
-                        <div class="db-row" id="itwn0r">
-                            <span class="fk" id="isml3n">FK</span> traject
-                        </div>
-                        <div class="db-row" id="iih4x7">type</div>
-                    </div><!-- ORTHOGONAL CONNECTORS (V5) --><!-- 1:1 Pixel Mapping with CSS positions -->
+                        <div class="db-row" id="iih4x7">DP, DM, DT,</div>
+                        <div class="db-row">MP, MM, MT</div>
+                    </div><!-- ORTHOGONAL CONNECTORS -->
                     <svg width="100%" height="100%" class="erd-svg" id="iydcxv">
                         <defs id="iplhz4">
                             <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
                                 <path d="M0,0 L0,8 L8,4 z" fill="#003082" id="icg04m"></path>
                             </marker>
                         </defs>
+                        <!-- Weer.locatie -> Location -->
                         <path d="M 120 300 L 120 250 L 120 180" stroke="#003082" stroke-width="2" fill="none"
                             marker-end="url(#arrow)" id="iug8hu"></path>
+                        <!-- Station.locatie -> Location -->
                         <path d="M 300 120 L 255 120 L 210 120" stroke="#003082" stroke-width="2" fill="none"
                             marker-end="url(#arrow)" id="idstsp"></path>
+                        <!-- Stop.station -> Station -->
                         <path d="M 390 300 L 390 240 L 390 180" stroke="#003082" stroke-width="2" fill="none"
                             marker-end="url(#arrow)" id="iujpsm"></path>
-                        <path d="M 520 350 L 535 350 L 535 350 L 550 350" stroke="#003082" stroke-width="2" fill="none"
-                            marker-end="url(#arrow)" id="i7xxfa"></path>
-                        <path d="M 640 300 L 640 240 L 640 180" stroke="#003082" stroke-width="2" fill="none"
-                            marker-end="url(#arrow)" id="i73jt7"></path>
-                        <path d="M 550 120 L 515 120 L 480 120" stroke="#003082" stroke-width="2" stroke-dasharray="4,4"
+                        <!-- Weer.type -> Weertype -->
+                        <path d="M 180 380 L 530 380 L 530 330" stroke="#003082" stroke-width="2" stroke-dasharray="4,4"
                             fill="none" marker-end="url(#arrow)" id="ii979p"></path>
                     </svg>
                 </div> <!-- End ERD Canvas -->
                 <div class="sql-box" id="ijz3jg">
-                    <strong id="i7axw1">SQL Analyses:</strong>
-                    <code id="iwkacv">SELECT type, AVG(vertraging) FROM real_stop JOIN weer ... GROUP BY type;</code>
+                    <strong id="i7axw1">SQL Analyse:</strong>
+                    <code id="iwkacv">SELECT w.type, AVG(s.vertraging_vertrek) FROM stop s JOIN station st ON s.station = st.id JOIN location l ON st.locatie = l.id JOIN weer w ON w.locatie = l.id AND DATE(s.vertrek) = DATE(w.tijd) GROUP BY w.type;</code>
                 </div>
             </div><!-- RIGHT COLUMN (Results) -->
             <div id="isrvw1" role="complementary" aria-label="Rechter kolom: resultaten en conclusie"
@@ -184,19 +174,19 @@
                     <h2 id="itply2">Resultaten</h2>
                     <div id="ipv1dk" class="stats-grid">
                         <div id="imlw4k" class="stat-item">
-                            <div id="ih6k0o" class="stat-val blue">4.2<small id="ib9kp3">min</small>
+                            <div id="ih6k0o" class="stat-val blue">DP<small id="ib9kp3"> Droog Polair</small>
                             </div>
-                            <div id="i5z89w" class="stat-label">Regen</div>
+                            <div id="i5z89w" class="stat-label">Koud &amp; droog (vorst, ijs)</div>
                         </div>
                         <div id="iml3uy" class="stat-item">
-                            <div id="i5lj05" class="stat-val blue">6.5<small id="iws4cp">min</small>
+                            <div id="i5lj05" class="stat-val blue">MM<small id="iws4cp"> Nat Matig</small>
                             </div>
-                            <div id="iyhyic" class="stat-label">Storm</div>
+                            <div id="iyhyic" class="stat-label">Gematigd &amp; nat (regen)</div>
                         </div>
                         <div id="ifjmhs" class="stat-item">
-                            <div id="ivin1o" class="stat-val yellow">9.4<small id="i7fjoj">min</small>
+                            <div id="ivin1o" class="stat-val yellow">MT<small id="i7fjoj"> Nat Tropisch</small>
                             </div>
-                            <div id="ib4ffh" class="stat-label">Sneeuw</div>
+                            <div id="ib4ffh" class="stat-label">Warm &amp; vochtig (zware regen)</div>
                         </div>
                     </div>
                     <img src="footer_viz.png" alt="NS Train in Snow"

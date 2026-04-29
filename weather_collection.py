@@ -9,7 +9,7 @@ import csv
 from datetime import datetime, timedelta
 
 # Configuration
-API_KEY = "eyJvcmciOiI1ZTU1NGUxOTI3NGE5NjAwMDEyYTNlYjEiLCJpZCI6IjU3OTNkYmExYWQxMjQwYjY4MzM0ZjNkZThiMjI1YWFjIiwiaCI6Im11cm11cjEyOCJ9"
+API_KEY = os.environ.get("KNMI_API_KEY", "")
 DATASET_NAME = "10-minute-in-situ-meteorological-observations"
 DATASET_VERSION = "1.0"
 DOWNLOAD_DIRECTORY = "weather_data"
