@@ -209,23 +209,6 @@ li {
     z-index: 2;
 }
 
-.chart-simple {
-    height: 150px;
-    background: #F4F4F4;
-    border-radius: 6px;
-    border: 1px dashed #CCC;
-    margin-top: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    font-size: 0.9rem;
-}
-
-.chart-simple::after {
-    content: "Visualisatie hier";
-}
-
 .db-head {
     background: var(--ns-blue);
     color: white;
@@ -280,13 +263,8 @@ li {
 }
 
 /* Col 3 */
-.pos-traject {
-    top: 100px;
-    left: 550px;
-}
-
 .pos-trein {
-    top: 300px;
+    top: 100px;
     left: 550px;
 }
 

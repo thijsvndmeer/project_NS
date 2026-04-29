@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Downloaded KNMI NetCDF files (large binary files)
+weather_data/*.nc
+
+# MySQL InnoDB data files
+nsdatabase/*.ibd
+
+# Environment / secrets
+.env
+
+# OS
+.DS_Store
+Thumbs.db
